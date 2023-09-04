@@ -1,0 +1,41 @@
+Kafka Installation
+------------------
+1)	download the kafka from the following location.
+
+	https://kafka.apache.org/downloads
+	
+2)	extract into the kafka folder
+
+3)	copy the config folder into the bin folder 
+
+4)	change the properties in the zookeeper.properties file.
+
+		data dir change to your environment specific file.
+
+		dataDir=F:/Interview Prep/Softwares/kafka3/datadir/zookeeper
+
+5)	change the config/server.properties 
+
+		fileslog.dirs=F:/Interview Prep/Softwares/kafka3/datadir/kafka-logs
+
+6)	start the zookeeper 
+
+		zookeeper-server-start.bat ./config/zookeeper.properties
+		
+7)	start the server 
+
+		kafka-server-start.bat ./config/server.properties
+		
+8)	Create a Kafka Topic:
+		
+		kafka-topics.bat --create --topic test --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1
+
+		kafka-topics.bat --list --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1
+
+9)	Creating Kafka Producer:
+	
+	kafka-console-producer.bat --broker-list localhost:9092 --topic test
+
+10)	Creating Kafka Consumer:
+	
+	kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
