@@ -4,38 +4,80 @@ Kafka Installation
 
 	https://kafka.apache.org/downloads
 	
-2)	extract into the kafka folder
+2)	extract into the kafka folder.
 
 3)	copy the config folder into the bin folder 
 
-4)	change the properties in the zookeeper.properties file.
+4)	change the properties in the bin/windows/config/zookeeper.properties file.
 
-		data dir change to your environment specific file.
+		data dir change to your environment specific file. Create a data dir in the kafka folder 
 
-		dataDir=F:/Interview Prep/Softwares/kafka3/datadir/zookeeper
+		dataDir= {kafka-installation-dir}/datadir/zookeeper
 
-5)	change the config/server.properties 
+5)	change the bin/windows/config/server.properties 
 
-		fileslog.dirs=F:/Interview Prep/Softwares/kafka3/datadir/kafka-logs
+		logs.dirs= {kafka-installation-dir}/datadir/kafka-logs
 
-6)	start the zookeeper 
+6)	start the zookeeper which is in the {kafka-installation-dir}/bin/windows folder.
+
+		open the command promt for the windows folder and execute the following command. 
 
 		zookeeper-server-start.bat ./config/zookeeper.properties
 		
-7)	start the server 
+7)	start the server which is in the {kafka-installation-dir}/bin/windows folder.
+
+		open the command promt for the windows folder and execute the following command.
 
 		kafka-server-start.bat ./config/server.properties
 		
 8)	Create a Kafka Topic:
+
+		open the command promt for the windows folder and execute the following command. 
 		
 		kafka-topics.bat --create --topic test --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1
 
 		kafka-topics.bat --list --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1
 
 9)	Creating Kafka Producer:
+
+	open the command promt for the windows folder and execute the following command. 
 	
 	kafka-console-producer.bat --broker-list localhost:9092 --topic test
 
 10)	Creating Kafka Consumer:
 	
+	open the command promt for the windows folder and execute the following command. 
+	
 	kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
