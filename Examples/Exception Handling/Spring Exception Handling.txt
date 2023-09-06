@@ -1,0 +1,104 @@
+Spring Exception Handling
+-------------------------
+We can handle the exceptions in two ways.
+
+1)	Exception Handler
+
+2)	controller advice
+
+Exception Handler
+-----------------
+Exception handling methods annotated with @ExceptionHandler will catch the exception thrown by the declared class and we can perform various things whenever we come through the related type exceptions. We can catch various exceptions and throw various http status codes depending on the exception which we need to handle. 
+
+@RestController
+@RequestMapping("/students")
+public class StudentController {
+
+	@Autowired
+	StudentService studentService;
+
+	@GetMapping
+	public ResponseEntity<List<Student>> getAllStudents() {
+		return ResponseEntity.status(HttpStatus.OK).body(studentService.getAllStudents());
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<Student> getStudentById(int id) throws Exception {
+		Optional<Student> student = studentService.getStudentById(id);
+		if (student.isEmpty())
+			throw new DataNotFoundException("There is not student with this id - " + id);
+		return ResponseEntity.status(HttpStatus.OK).body(student.get());
+	}
+
+	@PostMapping
+	public ResponseEntity<Student> save(@RequestBody Student student) {
+		return ResponseEntity.status(HttpStatus.OK).body(studentService.save(student));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<Student> update(@PathVariable int id, @RequestBody Student student) throws Exception {
+		if (student == null || id != student.getId()) {
+			throw new BadRequestException("incoming id in body doesn't match path");
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(studentService.save(student));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteById(@PathVariable int id) {
+		studentService.deleteById(id);
+		return ResponseEntity.status(HttpStatus.OK).body("deleted successfully");
+	}
+
+	@ExceptionHandler(value = { BadRequestException.class, DataNotFoundException.class })
+	public ResponseEntity<ErrorDetails> dataNotFoundException(Exception ex) {
+		ErrorDetails response = new ErrorDetails(new Date(), ex.getClass().getName(), ex.getLocalizedMessage());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+}
+
+controller advice
+-----------------
+@ControllerAdvice constructor comes with some special arguments which allows you to scan only the related portion of your application and handle only those exceptions thrown by the respective classes mentioned in the constructor.
+
+1) annotations — Controllers that are annotated with the mentioned annotations will be assisted by the @ControllerAdvice annotated class and are eligible for exception of those classes
+
+eg. @ControllerAdvice(annotations = RestController.class) — Here the exception helper annotated by @ControllerAdvice will catch all the exceptions thrown by the @RestController annotation classes.
+
+2) basePackages — By Specifying the packages which we want to scan and handling exceptions for the same.
+
+eg. @ControllerAdvice(basePackages = “org.example.controllers”) — This will only scan call the mentioned package and handle the exceptions for the same.
+
+3) assignableTypes — This arguments will make sure to scan and handle the exceptions from the mentioned classes
+
+eg. @ControllerAdvice(assignableTypes = {ControllerInterface.class,
+
+AbstractController.class})
+
+@ControllerAdvice
+public class ExceptionHelper {
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionHelper.class);
+    @ExceptionHandler(value = { InvalidInputException.class })
+    public ResponseEntity<Object> handleInvalidInputException(InvalidInputException ex) {
+        LOGGER.error("Invalid Input Exception: ",ex.getMessage());
+        return new ResponseEntity<Object>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }    
+
+    @ExceptionHandler(value = { Unauthorized.class })
+    public ResponseEntity<Object> handleUnauthorizedException(Unauthorized ex) {
+        LOGGER.error("Unauthorized Exception: ",ex.getMessage());
+        return new ResponseEntity<Object>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }    
+
+    @ExceptionHandler(value = { BusinessException.class })
+    public ResponseEntity<Object> handleBusinessException(BusinessException ex) {
+        LOGGER.error("Business Exception: ",ex.getMessage());
+        return new ResponseEntity<Object>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }    
+
+    @ExceptionHandler(value = { Exception.class })
+    public ResponseEntity<Object> handleException(Exception ex) {
+        LOGGER.error("Exception: ",ex.getMessage());
+        return new ResponseEntity<Object>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+}
